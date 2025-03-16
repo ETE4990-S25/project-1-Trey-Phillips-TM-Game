@@ -1,3 +1,5 @@
+import random
+
 class Item: #small and large items to be obtained (hold 2 large, any number of small)
     def __init__(self, name, size = 'small', item_type = None, effect = None, heal = 0, attack = 0, defense = 0):
         self.name = name
