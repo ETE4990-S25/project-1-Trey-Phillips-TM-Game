@@ -1,3 +1,4 @@
+from inventory import Character_Inventory
 class Character_Class: #initialize character classes/weapons/stats
     def __init__(self, name, weapon, health, attack, defense):
         self.name = name
