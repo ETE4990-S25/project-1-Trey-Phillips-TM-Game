@@ -9,6 +9,15 @@ class Item: #small and large items to be obtained (hold 2 large, any number of s
         self.heal = heal
         self.attack = attack
         self.defense = defense
+    
+        if self.item_type == 'heal':
+            self.effect_value = heal
+        elif self.item_type == 'weapon':
+            self.effect_value = attack
+        elif self.item_type == 'shield':
+            self.effect_value = defense
+        else:
+            self.effect_value = 0
 
     def use(self, character):
         if self.item_type == "heal":
@@ -54,23 +63,3 @@ class Character_Inventory: #managable inventory system to add/remove gained item
             print(f" - {item.name} (Small) | Heal: {item.heal}, Attack: {item.attack}, Defense: {item.defense}")
         for item in self.large_items:
             print(f" - {item.name} (Large) | Heal: {item.heal}, Attack: {item.attack}, Defense: {item.defense}")
-
-small_loot_pool = [
-    ("Bandages", 'heal', 10, 0, 0),
-    ("Syringe", 'heal', 7, random.randint(2, 5), 0),
-    ("Experimental Ammunition", 'weapon', 0, random.randint(1, 3), 0),
-    ("Duct Tape", 'heal', 3, 0, 0),
-    ("MedKit", 'heal', 15, 0, 0),
-    ("Wrappings", 'heal', 2, 0, 1),
-]
-
-large_loot_pool = [
-    ("Riot Shield", 'shield', 0, 0, 7),
-    ("Repair Kit", 'heal', random.randint(15, 30), 0, 0),
-    ("Assault Rifle", 'weapon', 0, random.randint(7, 10), 0),
-    ("Flamethrower", 'weapon', 0, random.randint(5, 7), 0),
-    ("Broken Pipe", 'weapon', 0, random.randint(3, 6), 0),
-    ("Wall Panel", 'shield, 0, 0, 3'),
-    ("Fire Extinguisher", 'weapon', 0, random.randint(2, 4), 0),
-    ("Corpse", 'shield', 0, 0, random.randint(4, 5)),
-]

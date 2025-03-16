@@ -1,4 +1,5 @@
 from inventory import Character_Inventory
+
 class Character_Class: #initialize character classes/weapons/stats
     def __init__(self, name, weapon, health, attack, defense):
         self.name = name
@@ -7,10 +8,7 @@ class Character_Class: #initialize character classes/weapons/stats
         self.health = health
         self.attack = attack
         self.defense = defense
-        self.reactor_meltdown_started = False
         self.equipped_large_items = []
-        self.quest_log = [] 
-        self.completed_puzzles = []
 
     def use_item(self, item):
         if item.item_type == "heal":
@@ -75,37 +73,6 @@ class Character_Class: #initialize character classes/weapons/stats
         self.defense = 5 
         self.apply_weapon()
         self.apply_shield()
-    
-    def add_quest(self, quest):
-        self.quest_log.append(quest)
-
-    def check_quests(self):
-        print("Current Objectives:")
-        for quest in self.quest_log:
-            print(f"{quest.description}: {quest.check_status()}")
-
-    def check_reactor_meltdown(self):
-        generator_status = all(quest.is_completed for quest in self.quest_log if "Start the" in quest.description)
-    
-        if generator_status:
-            self.reactor_meltdown_started = True
-            print(f"Both generators have been started. Reactor meltdown initiated.")
-            return True
-        return False
-
-    def start_reactor_meltdown(self):
-        if not self.reactor_meltdown_started:
-            print("Initiating reactor meltdown.")
-            self.reactor_meltdown_started = True
-        else:
-            print("Stop my child. You've already won.")
-    
-    def solve_puzzle(self, puzzle):
-        print(puzzle.description)
-        player_input = input("Enter your answer: ")
-        puzzle.attempt_solution(player_input)
-        if puzzle.solved:
-            self.completed_puzzles.append(puzzle)
 
 class Character_Creator:
     def __init__(self):

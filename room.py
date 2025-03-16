@@ -1,3 +1,26 @@
+import random 
+from inventory import Character_Inventory, Item
+
+small_loot_pool = [
+    ("Bandages", 'heal', 10, 0, 0),
+    ("Syringe", 'heal', 7, random.randint(2, 5), 0),
+    ("Experimental Ammunition", 'weapon', 0, random.randint(1, 3), 0),
+    ("Duct Tape", 'heal', 3, 0, 0),
+    ("MedKit", 'heal', 15, 0, 0),
+    ("Wrappings", 'heal', 2, 0, 1),
+]
+
+large_loot_pool = [
+    ("Riot Shield", 'shield', 0, 0, 7),
+    ("Repair Kit", 'heal', random.randint(15, 30), 0, 0),
+    ("Assault Rifle", 'weapon', 0, random.randint(7, 10), 0),
+    ("Flamethrower", 'weapon', 0, random.randint(5, 7), 0),
+    ("Broken Pipe", 'weapon', 0, random.randint(3, 6), 0),
+    ("Wall Panel", 'shield, 0, 0, 3'),
+    ("Fire Extinguisher", 'weapon', 0, random.randint(2, 4), 0),
+    ("Corpse", 'shield', 0, 0, random.randint(4, 5)),
+]
+
 class Room: #create rooms and keep track of whether they've been visited
     global current_room_index
 
@@ -11,6 +34,7 @@ class Room: #create rooms and keep track of whether they've been visited
         self.enemy = None
 
     def apply_random_effect(self, character, rooms):
+        from enemy import encounter_enemy
         effects = ["hazardous waste", "burning", "stim_shot", "enemy_encounter", "nothing"]
         chosen_effect = random.choice(effects)
 
@@ -36,12 +60,6 @@ class Room: #create rooms and keep track of whether they've been visited
             self.visited = True
             self.apply_random_effect(character, rooms)
             self.generate_loot()
-            if self.room_type == 'left_generator_room':
-                self.fix_generator(character, 'left')
-            elif self.room_type == 'right_generator_room':
-                self.fix_generator(character, 'right')
-            elif self.room_type == 'reactor_room':
-                self.start_reactor_meltdown(character)
     
     def search_room(self, character):
         if self.small_loot_count > 0 or self.large_loot_count > 0:
@@ -70,22 +88,3 @@ class Room: #create rooms and keep track of whether they've been visited
     def generate_loot(self):
         self.small_loot_count = random.randint(1, 3) 
         self.large_loot_count = random.randint(0, 1) 
-
-    def fix_generator(self, character, side):
-            if side == 'left':
-                self.solve_generator_puzzle(character, 'left')
-            elif side == 'right':
-                self.solve_generator_puzzle(character, 'right')
-
-    def solve_generator_puzzle(self, character, side):
-        if not character.left_generator_fixed and side == "left":
-            solved = character.solve_generator_puzzle("left")
-            if solved:
-                print(f"The left generator is now fixed.")
-        elif not character.right_generator_fixed and side == "right":
-            solved = character.solve_generator_puzzle("right")
-            if solved:
-                print(f"The right generator is now fixed.")
-                
-    def start_reactor_meltdown(self, character):
-        character.start_reactor_meltdown()
