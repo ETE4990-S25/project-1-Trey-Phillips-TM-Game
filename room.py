@@ -56,10 +56,15 @@ class Room: #create rooms and keep track of whether they've been visited
             print("You enter the room and feel... nothing? This seems like a safe place to get your bearings.")
 
     def visit(self, character, rooms):
+        from enemy import encounter_enemy
         if not self.visited:
             self.visited = True
             self.apply_random_effect(character, rooms)
             self.generate_loot()
+            encounter_chance = random.randint(1, 60)
+            success_threshold = 40
+            if encounter_chance <= success_threshold:
+                encounter_enemy(character, rooms)
     
     def search_room(self, character):
         if self.small_loot_count > 0 or self.large_loot_count > 0:
