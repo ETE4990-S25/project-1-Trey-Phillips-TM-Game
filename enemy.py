@@ -3,139 +3,123 @@ from room import Room
 from inventory import Item, Character_Inventory
 from character import Character_Class
 
-def create_rooms():
-    rooms = []
-    for i in range(1, 1000):
-        room = Room(i)
-        rooms.append(room)
+def create_rooms() -> list[Room]:
+    """Create and shuffle rooms"""
 
+    rooms = [Room(i) for i in range(1, 1000)]
     random.shuffle(rooms) 
     return rooms
 
 class Enemy:
-    def __init__(self, name, health, attack, defense):
+    def __init__(self, name: str, health: int, attack: int, defense: int):
         self.name = name
         self.health = health
         self.attack = attack
         self.defense = defense
+
+    def __str__(self):
+        return f"{self.name} (Health: {self.health}, Attack: {self.attack}, Defense: {self.defense})"
     
     def take_damage(self, damage):
+        """Enemy health after taking damage, reduced by enemy defense"""
+
         damage_taken = max(0, damage - self.defense)
-        self.health -= damage_taken
-        if self.health < 0:
-            self.health = 0
-        print(f"{self.name} is hit for {damage_taken} and has {self.health} health remaining.")
+        self.health = max(0, self.health - damage_taken)
+        if self.health == 0:
+            print(f"{self.name} takes {damage_taken} damage and falls limply to the ground")
+        else:
+            print(f"{self.name} takes {damage_taken} damage and has {self.health} HP left.")
         
     def attack_character(self, character):
-        damage_dealt = max(0, self.attack - character.defense)
-        character.health -= damage_dealt
-        if character.health < 0:
-            character.health = 0
-        print(f"{self.name} swings for {damage_dealt} damage. You have {character.health} health left.")
+        """Attack player using character's take_damage logic"""
+
+        character.take_damage(self.attack)
     
     def lives(self):
         return self.health > 0
     
 enemy_stats = {
-    "Drone": {
-        "health_range": (30, 50),
-        "attack_range": (5, 10),
-        "defense_range": (0, 5)
-    },
-    "Grunt": {
-        "health_range": (50, 70),
-        "attack_range": (10, 15),
-        "defense_range": (3, 8)
-    },
-    "Elite": {
-        "health_range": (70, 90),
-        "attack_range": (15, 20),
-        "defense_range": (5, 12)
-    },
-    "Abomination": {
-        "health_range": (90, 120),
-        "attack_range": (20, 30),
-        "defense_range": (8, 15)
-    }
+    "Drone":        {"health_range": (30, 50), "attack_range": (5, 10), "defense_range": (0, 5)},
+    "Grunt":        {"health_range": (50, 70), "attack_range": (10, 15), "defense_range": (3, 8)},
+    "Elite":        {"health_range": (70, 90), "attack_range": (15, 20), "defense_range": (5, 12)},
+    "Abomination":  {"health_range": (90, 120), "attack_range": (20, 30), "defense_range": (8, 15)}
 }
 
-def encounter_enemy(character, rooms):
-    print("Something stares at you in the darkness.")
+def generate_enemy():
+    """Randomly generate an enemy"""
 
-    enemy_name = random.choice(["Drone", "Grunt", "Elite", "Abomination"])
+    enemy_name = random.choice(list(enemy_stats.keys()))
     stats = enemy_stats[enemy_name]
-    enemy_health = random.randint(stats["health_range"][0], stats["health_range"][1])
-    enemy_attack = random.randint(stats["attack_range"][0], stats["attack_range"][1])
-    enemy_defense = random.randint(stats["defense_range"][0], stats["defense_range"][1])
-    enemy = Enemy(name=enemy_name, health=enemy_health, attack=enemy_attack, defense=enemy_defense)
-    
-    print(f"You step into the room and the {enemy.name} attacks.")
+    new_enemy = Enemy(
+        name = enemy_name,
+        health = random.randint(*stats["health_range"]),
+        attack = random.randint(*stats["attack_range"]),
+        defense = random.randint(*stats["defense_range"])
+    )
+    print(f"A {new_enemy} appears from the shadows...")
+    return new_enemy
+
+def user_attacks_enemy(character: Character_Class, enemy: Enemy):
+    """Character attacks enemy"""
+
+    damage = max(0, random.randint(character.attack - 5, character.attack + 5))
+    enemy.take_damage(damage)
+
+def combat_item_use(character: Character_Class):
+    """Use item in combat"""
+
+    character.inventory.view_inventory()
+    if not character.inventory.small_items and not character.inventory.large_items:
+        print("Your inventory is empty. Nothing to use.")
+        return
+
+    print("Choose an item to use:")
+    all_items = character.inventory.small_items + character.inventory.large_items
+    for idx, item in enumerate(all_items, 1):
+        print(f"{idx}. {item.name}")
+
+    item_choice = input("Choose an item number to use (or press Enter to cancel): ").strip()
+    if not item_choice:
+        return
+    try:
+        item_index = int(item_choice) - 1
+        chosen_item = all_items[item_index]
+        character.use_item(chosen_item)
+        character.inventory.remove_item(chosen_item)
+    except (ValueError, IndexError):
+        print("Invalid choice. Please enter a valid item number.")  
+
+def encounter_enemy(character: Character_Class, rooms: list[Room], current_room_index: int) -> int:
+    """Handles combat and interaction when encountering an enemy. Returns the updated room index."""
 
     while enemy.lives() and character.lives():
         print(f"\n{character.name} (Health: {character.health}) vs {enemy.name} (Health: {enemy.health})")
-
         action = input("Do you want to attack (1), use an item (2), or run (3)? ")
+
         if action == '1':
-            damage = random.randint(character.attack - 5, character.attack + 5) - enemy.defense
-            damage = max(damage, 0) 
-            enemy.take_damage(damage)
-            if not enemy.lives():
-                print(f"{enemy.name} has been defeated!")
-                break
+            user_attacks_enemy(character, enemy)
         elif action == '2':
-            character.inventory.view_inventory()
-            print("Choose an item to use.")
-            if character.inventory.small_items or character.inventory.large_items:
-                print("Your inventory: ")
-                if character.inventory.small_items:
-                    print("Small Items:")
-                    for idx, item in enumerate(character.inventory.small_items, 1):
-                        print(f"{idx}. {item.name}")
-                if character.inventory.large_items:
-                    print("Large Items:")
-                    for idx, item in enumerate(character.inventory.large_items, 1):
-                        print(f"{idx}. {item.name}")
-                
-                item_choice = input("Choose an item number to use (or press Enter to cancel): ").strip()
-
-                if item_choice: 
-                    try:
-                        item_idx = int(item_choice) - 1
-                        if 0 <= item_idx < len(character.inventory.small_items):
-                            item = character.inventory.small_items[item_idx]
-                            character.use_item(item) 
-                            character.inventory.remove_item(item)  
-                        elif 0 <= item_idx < len(character.inventory.large_items):
-                            item = character.inventory.large_items[item_idx]
-                            character.use_item(item)  
-                            character.inventory.remove_item(item) 
-                        else:
-                            print("Invalid choice, please select a valid item.")
-                    except ValueError:
-                        print("Invalid input, please enter a number.")
-            else:
-                print("Your inventory is empty. Nothing to use.")
+            combat_item_use(character)
         elif action == '3':
-            print("You attempt to run past the monster.")
             escape_chance = random.randint(1, 100)
-            success_threshold = 40
-
-            if escape_chance <= success_threshold:
+            if escape_chance <= 40:
                 print(f"{character.name} successfully runs away from the {enemy.name}!")
-                if current_room_index < len(rooms) - 1:
-                    current_room_index += 1
-                    print(f"\nMoving to Room {rooms[current_room_index].room_id}...")
-                else:
-                    print("You realize you're at the last room")
-                    current_room_index -= 1
-                    print(f"\nMoving to Room {rooms[current_room_index].room_id}...")
-                break
+                current_room_index += 1 if current_room_index < len(rooms) - 1 else -1
+                print(f"\nMoving to Room {rooms[current_room_index].room_id}")
+                return current_room_index
+            else:
+                print("You failed to escape!")
         else:
             print("Not a valid choice. Choose between 1, 2, or 3")
             continue
 
         if enemy.lives():
             enemy.attack_character(character)
-            if not character.lives():
-                return
+
+    if not enemy.lives():
+        print(f"{enemy.name} has been defeated!")
+    elif not character.lives():
+        print("You have fallen in battle.")
+
+    return current_room_index
 
