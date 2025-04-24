@@ -23,18 +23,45 @@ class Item:
 
     def use(self, character):
         if self.item_type == "heal":
-            character.health += self.effect_value
-            print(f"{character.name} is healed for {self.effect_value} health.")
+            self._heal_character(character)
         elif self.item_type == "weapon":
-            character.attack += self.effect_value
-            print(f"{character.name}'s attack increased by {self.effect_value}.")
+            self._increase_attack(character)
         elif self.item_type == "shield":
-            character.defense += self.effect_value
-            print(f"{character.name}'s defense increased by {self.effect_value}.")
+            self._increase_defense(character)
         else:
+            print(f"Warning: Unhandled item type '{self.item_type}' for {self.name}")
             print(f"{self.name} has no effect on {character.name}.")
 
-class Character_Inventory: #managable inventory system to add/remove gained items
+    def heal_character(self, character):
+        character.health += self.effect_value
+        print(f"{character.name} is healed for {self.effect_value} health.")
+
+    def increase_attack(self, character):
+        character.attack += self.effect_value
+        print(f"{character.name}'s attack increased by {self.effect_value}.")
+
+    def increase_defense(self, character):
+        character.defense += self.effect_value
+        print(f"{character.name}'s defense increased by {self.effect_value}.")
+
+    def item_description(self):
+        return f"{self.name} ({'Large' if self.size == 'large' else 'Small'}) | Heal: {self.heal}, Attack: {self.attack}, Defense: {self.defense}"
+    
+    @classmethod
+    def from_loot_data(cls, data, size):
+        return cls(
+            name=data[0],
+            size=size,
+            item_type=data[1],
+            effect=data[2],
+            heal=data[2],
+            attack=data[3],
+            defense=data[4]
+        )
+
+class Character_Inventory: 
+    """managable inventory system to add/remove gained items"""
+
     def __init__(self):
         self.small_items = [] 
         self.large_items = []
@@ -47,7 +74,7 @@ class Character_Inventory: #managable inventory system to add/remove gained item
             self.small_items.append(item)
             print(f"You pick up {item.name} and add it to your bag.")
         else:
-            print("You can can only carry two large items. You've only got two hands after all.")
+            print("You can only carry two large items. You've only got two hands after all.")
     
     def remove_item(self, item):
         if item in self.large_items:
@@ -59,9 +86,13 @@ class Character_Inventory: #managable inventory system to add/remove gained item
         else:
             print(f"{item.name} is not in your inventory.")
     
-    def view_inventory(self): 
+    def view_inventory(self):
         print("You peer into your bag, finding: ")
+        if not self.small_items and not self.large_items:
+            print("Nothing...You sure you're prepared for this mission?")
+            return
+
         for item in self.small_items:
-            print(f" - {item.name} (Small) | Heal: {item.heal}, Attack: {item.attack}, Defense: {item.defense}")
+            print(f" - {item.item_description()}")
         for item in self.large_items:
-            print(f" - {item.name} (Large) | Heal: {item.heal}, Attack: {item.attack}, Defense: {item.defense}")
+            print(f" - {item.item_description()}")

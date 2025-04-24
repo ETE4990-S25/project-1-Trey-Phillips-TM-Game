@@ -8,6 +8,7 @@ class Character_Class:
         self.weapon = weapon
         self.inventory = Character_Inventory()
         self.health = health
+        self.max_health = health
         self.attack = attack
         self.defense = defense
         self.equipped_large_items = []
@@ -53,14 +54,18 @@ class Character_Class:
 
         damage_taken = max(0, damage - self.defense)
         self.health = max(0, self.health - damage_taken)
-        print(f"You are hit for {damage_taken} and have {self.health} health remaining.")
+        print(f"You are hit for {damage_taken} and have {self.health}/{self.max_health} health remaining.")
 
     def lives(self):
         return self.health > 0
     
     def heal(self, healing_amount):
-        self.health += healing_amount
-        print(f"You heal {healing_amount} and now have {self.health} remaining.")
+        """Heal w/o going over max health"""
+
+        current_health = self.health
+        self.health = min(self.health + healing_amount, self.max_health)
+        healing_amount = self.health - current_health
+        print(f"You heal {healing_amount} and are now at {self.health}/{self.max_health} health.")
 
     def apply_weapon(self, weapon=None):
         """Applies bonus to attack"""

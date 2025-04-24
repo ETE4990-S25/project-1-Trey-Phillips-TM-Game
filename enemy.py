@@ -14,6 +14,7 @@ class Enemy:
     def __init__(self, name: str, health: int, attack: int, defense: int):
         self.name = name
         self.health = health
+        self.max_health = health
         self.attack = attack
         self.defense = defense
 
@@ -28,7 +29,7 @@ class Enemy:
         if self.health == 0:
             print(f"{self.name} takes {damage_taken} damage and falls limply to the ground")
         else:
-            print(f"{self.name} takes {damage_taken} damage and has {self.health} HP left.")
+            print(f"{self.name} was hit for {damage_taken} and has {self.health}/{self.max_health} health remaining.")
         
     def attack_character(self, character):
         """Attack player using character's take_damage logic"""
@@ -91,6 +92,8 @@ def combat_item_use(character: Character_Class):
 
 def encounter_enemy(character: Character_Class, rooms: list[Room], current_room_index: int) -> int:
     """Handles combat and interaction when encountering an enemy. Returns the updated room index."""
+    
+    enemy = generate_enemy()
 
     while enemy.lives() and character.lives():
         print(f"\n{character.name} (Health: {character.health}) vs {enemy.name} (Health: {enemy.health})")
