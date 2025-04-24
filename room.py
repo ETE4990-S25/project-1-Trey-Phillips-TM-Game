@@ -37,31 +37,29 @@ class Room:
     def apply_random_effect(self, character, rooms, current_room_index):
         """Random chance events as the user enters new rooms"""
 
-        effects = {
-            "hazardous waste": self.apply_hazardous_waste,
-            "burning": self.apply_burning,
-            "stim_shot": self.apply_stim_shot,
-            "enemy_encounter": self.apply_enemy_encounter,
-            "nothing": self.apply_nothing
-        }
-        chosen_effect = random.choice(list(effects.keys()))
+        effect = random.choice(["hazardous waste", "burning", "stim_shot", "enemy_encounter", "nothing"])
+        if effect == "hazardous waste":
+            self.apply_hazardous_waste(character)
+        elif effect == "burning":
+            self.apply_burning(character)
+        elif effect == "stim_shot":
+            self.apply_stim_shot(character)
+        elif effect == "enemy_encounter":
+            self.apply_enemy_encounter(character, rooms, current_room_index)
+        elif effect == "nothing":
+            self.apply_nothing(character)
 
-        if chosen_effect == "enemy_encounter":
-            effects[chosen_effect](character, rooms, current_room_index)
-        else:
-            effects[chosen_effect](character, rooms)
-
-    def apply_hazardous_waste(self, character, _):
+    def apply_hazardous_waste(self, character):
         damage = random.randint(5, 15)
-        character.takes_damage(damage)
-        print(f"You step in spilled waste. You take {damage} damage and are now at {character.health}/{character.max_health} health.")
+        actual_damage = character.takes_damage(damage)
+        print(f"You step in spilled waste. You take {actual_damage} damage and are now at {character.health}/{character.max_health} health.")
 
-    def apply_burning(self, character, _):
+    def apply_burning(self, character):
         damage = random.randint(3, 7)
-        character.takes_damage(damage)
-        print(f"You push through flames engulfing the room.\nYou take {damage} damage and are now at {character.health}/{character.max_health} health.")
+        actual_damage = character.takes_damage(damage)
+        print(f"You push through flames engulfing the room.\nYou take {actual_damage} damage and are now at {character.health}/{character.max_health} health.")
 
-    def apply_stim_shot(self, character, _):
+    def apply_stim_shot(self, character):
         stim_shot = random.randint(6, 10)
         character.heal(stim_shot)
         print(f"As you enter the room, you begin to feel rejuvenated. \nA surge of energy washes over you and you realize you are now at {character.health}/{character.max_health} health.")

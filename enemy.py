@@ -1,7 +1,7 @@
 import random
 from room import Room
 from inventory import Item, Character_Inventory
-from character import Character_Class
+from character import Character_Class 
 
 def create_rooms() -> list[Room]:
     """Create and shuffle rooms"""
@@ -21,7 +21,7 @@ class Enemy:
     def __str__(self):
         return f"{self.name} (Health: {self.health}, Attack: {self.attack}, Defense: {self.defense})"
     
-    def take_damage(self, damage):
+    def takes_damage(self, damage):
         """Enemy health after taking damage, reduced by enemy defense"""
 
         damage_taken = max(0, damage - self.defense)
@@ -32,9 +32,9 @@ class Enemy:
             print(f"{self.name} was hit for {damage_taken} and has {self.health}/{self.max_health} health remaining.")
         
     def attack_character(self, character):
-        """Attack player using character's take_damage logic"""
+        """Attack player using character's takes_damage logic"""
 
-        character.take_damage(self.attack)
+        character.takes_damage(self.attack)
     
     def lives(self):
         return self.health > 0
@@ -64,7 +64,7 @@ def user_attacks_enemy(character: Character_Class, enemy: Enemy):
     """Character attacks enemy"""
 
     damage = max(0, random.randint(character.attack - 5, character.attack + 5))
-    enemy.take_damage(damage)
+    enemy.takes_damage(damage)
 
 def combat_item_use(character: Character_Class):
     """Use item in combat"""

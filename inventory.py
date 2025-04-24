@@ -23,11 +23,11 @@ class Item:
 
     def use(self, character):
         if self.item_type == "heal":
-            self._heal_character(character)
+            self.heal_character(character)
         elif self.item_type == "weapon":
-            self._increase_attack(character)
+            self.increase_attack(character)
         elif self.item_type == "shield":
-            self._increase_defense(character)
+            self.increase_defense(character)
         else:
             print(f"Warning: Unhandled item type '{self.item_type}' for {self.name}")
             print(f"{self.name} has no effect on {character.name}.")
