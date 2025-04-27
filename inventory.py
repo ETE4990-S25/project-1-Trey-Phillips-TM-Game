@@ -1,5 +1,3 @@
-import random
-
 class Item: 
     """small and large items to be obtained (hold 2 large, any number of small)"""
     

@@ -1,26 +1,6 @@
 import random 
-from inventory import Character_Inventory, Item
+from inventory import Item
 current_room_index = 0
-
-small_loot_pool = [
-    ("Bandages", 'heal', 10, 0, 0),
-    ("Syringe", 'heal', 7, random.randint(2, 5), 0),
-    ("Experimental Ammunition", 'weapon', 0, random.randint(1, 3), 0),
-    ("Duct Tape", 'heal', 3, 0, 0),
-    ("MedKit", 'heal', 15, 0, 0),
-    ("Wrappings", 'heal', 2, 0, 1),
-]
-
-large_loot_pool = [
-    ("Riot Shield", 'shield', 0, 0, 7),
-    ("Repair Kit", 'heal', random.randint(15, 30), 0, 0),
-    ("Assault Rifle", 'weapon', 0, random.randint(7, 10), 0),
-    ("Flamethrower", 'weapon', 0, random.randint(5, 7), 0),
-    ("Broken Pipe", 'weapon', 0, random.randint(3, 6), 0),
-    ("Wall Panel", 'shield', 0, 0, 3),
-    ("Fire Extinguisher", 'weapon', 0, random.randint(2, 4), 0),
-    ("Corpse", 'shield', 0, 0, random.randint(4, 5)),
-]
 
 class Room: 
     """Create rooms and keep track of whether they've been visited"""

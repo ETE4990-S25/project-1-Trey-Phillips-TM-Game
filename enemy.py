@@ -1,6 +1,5 @@
 import random
 from room import Room
-from inventory import Item, Character_Inventory
 from character import Character_Class 
 
 def create_rooms() -> list[Room]:
@@ -46,16 +45,21 @@ enemy_stats = {
     "Abomination":  {"health_range": (90, 120), "attack_range": (20, 30), "defense_range": (8, 15)}
 }
 
-def generate_enemy():
+def generate_enemy(current_room_index: int):
     """Randomly generate an enemy"""
 
     enemy_name = random.choice(list(enemy_stats.keys()))
     stats = enemy_stats[enemy_name]
+    scaling_factor = max(1, current_room_index // 5)
+    health = random.randint(*stats["health_range"]) + (scaling_factor * 4)
+    attack = random.randint(*stats["attack_range"]) + (scaling_factor * 2)
+    defense = random.randint(*stats["defense_range"]) + (scaling_factor * 1)
+    
     new_enemy = Enemy(
         name = enemy_name,
-        health = random.randint(*stats["health_range"]),
-        attack = random.randint(*stats["attack_range"]),
-        defense = random.randint(*stats["defense_range"])
+        health = health,
+        attack = attack,
+        defense = defense
     )
     print(f"A {new_enemy} appears from the shadows...")
     return new_enemy
@@ -93,7 +97,7 @@ def combat_item_use(character: Character_Class):
 def encounter_enemy(character: Character_Class, rooms: list[Room], current_room_index: int) -> int:
     """Handles combat and interaction when encountering an enemy. Returns the updated room index."""
     
-    enemy = generate_enemy()
+    enemy = generate_enemy(current_room_index)
 
     while enemy.lives() and character.lives():
         print(f"\n{character.name} (Health: {character.health}) vs {enemy.name} (Health: {enemy.health})")
