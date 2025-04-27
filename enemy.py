@@ -1,12 +1,12 @@
 import random
+import time
 from room import Room
 from character import Character_Class 
 
 def create_rooms() -> list[Room]:
-    """Create and shuffle rooms"""
+    """Create rooms"""
 
     rooms = [Room(i) for i in range(1, 1000)]
-    random.shuffle(rooms) 
     return rooms
 
 class Enemy:
@@ -47,8 +47,14 @@ enemy_stats = {
 
 def generate_enemy(current_room_index: int):
     """Randomly generate an enemy"""
+    
+    if current_room_index < 10:
+        enemy_name = random.choice(["Drone", "Grunt"])
+    elif current_room_index < 20:
+        enemy_name = random.choice(["Drone", "Grunt", "Elite"])
+    else:
+        enemy_name = random.choice(["Grunt", "Elite", "Abomination"])
 
-    enemy_name = random.choice(list(enemy_stats.keys()))
     stats = enemy_stats[enemy_name]
     scaling_factor = max(1, current_room_index // 5)
     health = random.randint(*stats["health_range"]) + (scaling_factor * 4)
@@ -101,6 +107,7 @@ def encounter_enemy(character: Character_Class, rooms: list[Room], current_room_
 
     while enemy.lives() and character.lives():
         print(f"\n{character.name} (Health: {character.health}) vs {enemy.name} (Health: {enemy.health})")
+        time.sleep(0.5)
         action = input("Do you want to attack (1), use an item (2), or run (3)? ")
 
         if action == '1':
@@ -108,8 +115,11 @@ def encounter_enemy(character: Character_Class, rooms: list[Room], current_room_
         elif action == '2':
             combat_item_use(character)
         elif action == '3':
-            escape_chance = random.randint(1, 100)
-            if escape_chance <= 40:
+            base_escape_chance = 40
+            escape_penalty = (current_room_index // 10) * 5  # lose 5% every 10 rooms
+            escape_chance = max(5, base_escape_chance - escape_penalty)
+
+            if random.randint(1, 100) <= escape_chance:
                 print(f"{character.name} successfully runs away from the {enemy.name}!")
                 current_room_index += 1 if current_room_index < len(rooms) - 1 else -1
                 print(f"\nMoving to Room {rooms[current_room_index].room_id}")
@@ -126,7 +136,7 @@ def encounter_enemy(character: Character_Class, rooms: list[Room], current_room_
     if not enemy.lives():
         print(f"{enemy.name} has been defeated!")
     elif not character.lives():
-        print("You have fallen in battle.")
+        print("This expedition will be deemed a failure. We expected more from you.")
 
     return current_room_index
 

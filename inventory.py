@@ -1,3 +1,5 @@
+from jsonparse import parse_value
+
 class Item: 
     """small and large items to be obtained (hold 2 large, any number of small)"""
     
@@ -10,28 +12,25 @@ class Item:
         self.attack = attack
         self.defense = defense
     
-        if self.item_type == 'heal':
-            self.effect_value = heal
-        elif self.item_type == 'weapon':
-            self.effect_value = attack
-        elif self.item_type == 'shield':
-            self.effect_value = defense
-        else:
-            self.effect_value = 0
+        self.effect_value = {
+            "heal": heal,
+            "weapon": attack,
+            "armor": defense
+        }.get(self.item_type, 0)
 
     def use(self, character):
         if self.item_type == "heal":
             self.heal_character(character)
         elif self.item_type == "weapon":
             self.increase_attack(character)
-        elif self.item_type == "shield":
+        elif self.item_type == "armor":
             self.increase_defense(character)
         else:
             print(f"Warning: Unhandled item type '{self.item_type}' for {self.name}")
             print(f"{self.name} has no effect on {character.name}.")
 
     def heal_character(self, character):
-        character.health += self.effect_value
+        character.heal(self.effect_value)
         print(f"{character.name} is healed for {self.effect_value} health.")
 
     def increase_attack(self, character):
@@ -44,18 +43,6 @@ class Item:
 
     def item_description(self):
         return f"{self.name} ({'Large' if self.size == 'large' else 'Small'}) | Heal: {self.heal}, Attack: {self.attack}, Defense: {self.defense}"
-    
-    @classmethod
-    def from_loot_data(cls, data, size):
-        return cls(
-            name=data[0],
-            size=size,
-            item_type=data[1],
-            effect=data[2],
-            heal=data[2],
-            attack=data[3],
-            defense=data[4]
-        )
 
 class Character_Inventory: 
     """managable inventory system to add/remove gained items"""
@@ -77,10 +64,10 @@ class Character_Inventory:
     def remove_item(self, item):
         if item in self.large_items:
             self.large_items.remove(item)
-            print(f"You drop the {item.name}.")
+            print(f"You equip the {item.name}.")
         elif item in self.small_items:
             self.small_items.remove(item)
-            print(f"You drop the {item.name}.")
+            print(f"You use the {item.name}.")
         else:
             print(f"{item.name} is not in your inventory.")
     
@@ -90,7 +77,7 @@ class Character_Inventory:
             print("Nothing...You sure you're prepared for this mission?")
             return
 
-        for item in self.small_items:
+        for item in sorted(self.small_items, key=lambda x: x.name):
             print(f" - {item.item_description()}")
-        for item in self.large_items:
+        for item in sorted(self.large_items, key=lambda x: x.name):
             print(f" - {item.item_description()}")

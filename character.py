@@ -19,7 +19,7 @@ class Character_Class:
         item_usage = {
             "heal": lambda: item.use(self),
             "weapon": lambda: item.use(self),
-            "shield": lambda: item.use(self)
+            "armor": lambda: item.use(self)
         }
 
         item_action = item_usage.get(item.item_type)
@@ -30,24 +30,6 @@ class Character_Class:
                 self.inventory.remove_item(item)
         else:
             print(f"You are unable to use {item.name} at this time.")
-
-    def equip_large_item(self, item):
-        """Use large item for boost to attack/defense"""
-
-        if item.size == "large":
-            self.equipped_large_items.append(item)
-            self.attack += item.attack
-            self.defense += item.defense
-            print(f"You equip {item.name}. Your attack is now {self.attack} and defense is {self.defense}.")
-
-    def unequip_large_item(self, item):
-        """Unequip large item and remove its bonuses"""
-
-        if item in self.equipped_large_items:
-            self.equipped_large_items.remove(item)
-            self.attack -= item.attack
-            self.defense -= item.defense
-            print(f"You unequip {item.name}. Your attack is now {self.attack} and defense is {self.defense}.")
 
     def takes_damage(self, damage):
         """Damage calculations"""
@@ -74,12 +56,12 @@ class Character_Class:
             self.attack += weapon.effect
             print(f"Weapon equipped: {weapon.name}. Attack is now {self.attack}.")
 
-    def apply_shield(self, shield=None):
+    def apply_armor(self, armor=None):
         """Applies bonus to defense"""
 
-        if shield:
-            self.defense += shield.effect
-            print(f"You raise your {shield.name}. Defense is now {self.defense}.")
+        if armor:
+            self.defense += armor.effect
+            print(f"You raise your {armor.name}. Defense is now {self.defense}.")
     
     def __str__(self):
         """Displays character stats"""
@@ -91,10 +73,10 @@ class Character_Creator:
 
     def __init__(self):
         self.classes = {
-            1: {"name": "Engineer", "weapon": "Plasma Cutter", "health": 120, "attack": 8, "defense": 4},
-            2: {"name": "Overseer", "weapon": "Pistol", "health": 100, "attack": 12, "defense": 5},
+            1: {"name": "Engineer", "weapon": "Plasma Cutter", "health": 130, "attack": 10, "defense": 4},
+            2: {"name": "Overseer", "weapon": "Pistol", "health": 100, "attack": 13, "defense": 5},
             3: {"name": "Scientist", "weapon": "Experimental Rifle", "health": 80, "attack": 16, "defense": 3},
-            4: {"name": "Security Guard", "weapon": "Assault Rifle", "health": 150, "attack": 10, "defense": 7}
+            4: {"name": "Security Guard", "weapon": "Assault Rifle", "health": 110, "attack": 12, "defense": 7}
         }
 
     def class_display(self):

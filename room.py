@@ -1,6 +1,32 @@
+import json
+from jsonparse import parse_value
 import random 
 from inventory import Item
 current_room_index = 0
+
+def loot_lists_json(filepath, size):
+    """load small and large items from jsons"""
+
+    try:
+        with open(filepath, 'r') as f:
+            loot_data = json.load(f)
+            item_list = []
+            for item in loot_data:
+                item_list.append(Item(
+                    name = item['name'],
+                    size = size,
+                    item_type = item['type'],
+                    heal = parse_value(item.get('heal', 0)),
+                    attack = parse_value(item.get('attack', 0)),
+                    defense = parse_value(item.get('defense', 0))
+                ))
+            return item_list
+    except Exception as e:
+        print(f"Could not load loot from {filepath}: {e}")
+        return []
+    
+small_loot_pool = loot_lists_json('small_loot_list.json', 'small')
+large_loot_pool = loot_lists_json('large_loot_list.json', 'large')     
 
 class Room: 
     """Create rooms and keep track of whether they've been visited"""
@@ -70,11 +96,11 @@ class Room:
             print(f"You search the room...")
 
             for _ in range(self.small_loot_count):
-                loot_item = Item.from_loot_data(random.choice(small_loot_pool), 'small')
+                loot_item = random.choice(small_loot_pool)
                 character.inventory.add_item(loot_item)
 
             for _ in range(self.large_loot_count):
-                loot_item = Item.from_loot_data(random.choice(large_loot_pool), 'large')
+                loot_item = random.choice(large_loot_pool)
                 character.inventory.add_item(loot_item)
 
             self.small_loot_count = 0
@@ -83,5 +109,8 @@ class Room:
             print("You do not find anything in the room.")
 
     def generate_loot(self):
-        self.small_loot_count = random.randint(1, 3) 
-        self.large_loot_count = random.randint(0, 1) 
+        if small_loot_pool and large_loot_pool:
+            self.small_loot_count = random.randint(1, 3) 
+            self.large_loot_count = random.randint(0, 1)
+        else:
+            print("Loot pools are empty. No loot will be generated.")
