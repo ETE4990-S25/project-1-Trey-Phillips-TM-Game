@@ -1,0 +1,5 @@
+[
+  {"name": "Adrenaline Shot", "type": "heal", "heal": "random(20, 30)", "attack": 0, "defense": 0},
+  {"name": "Riot Gear", "type": "armor", "heal": 0, "attack": 0, "defense": "random(10, 15)"},
+  {"name": "High-Caliber Round Pack", "type": "weapon", "heal": 0, "attack": "random(8, 12)", "defense": 0}
+]
